@@ -5,11 +5,53 @@
 </head>
 <body>
     <h1>Booking Form</h1>
-    <form method="post">
+
+    <form method="post" novalidate>
         {% csrf_token %}
-        {{ form.as_p }}
+        
+        <p>
+            {{ form.user_name.label_tag }}<br>
+            {{ form.user_name }}<br>
+            {% for error in form.user_name.errors %}
+                <span style="color:red;">{{ error }}</span><br>
+            {% endfor %}
+        </p>
+
+        <p>
+            {{ form.date.label_tag }}<br>
+            {{ form.date }}<br>
+            {% for error in form.date.errors %}
+                <span style="color:red;">{{ error }}</span><br>
+            {% endfor %}
+        </p>
+
+        <p>
+            {{ form.start_time.label_tag }}<br>
+            {{ form.start_time }}<br>
+            {% for error in form.start_time.errors %}
+                <span style="color:red;">{{ error }}</span><br>
+            {% endfor %}
+        </p>
+
+        <p>
+            {{ form.end_time.label_tag }}<br>
+            {{ form.end_time }}<br>
+            {% for error in form.end_time.errors %}
+                <span style="color:red;">{{ error }}</span><br>
+            {% endfor %}
+        </p>
+        
+        <p>
+            {{ form.room.label_tag }}<br>
+            {{ form.room }}<br>
+            {% for error in form.room.errors %}
+                <span style="color:red;">{{ error }}</span><br>
+            {% endfor %}
+        </p>
+
         <button type="submit">Save</button>
     </form>
+
     <a href="{% url 'booking_list' %}">Back to list</a>
 </body>
 </html>
