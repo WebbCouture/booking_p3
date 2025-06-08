@@ -11,8 +11,12 @@
 
     <nav>
         <ul class="nav-list">
-            <li><a class="nav-link" href="{% url 'booking_list' %}">Home</a></li>
+            <!-- Change this to point to the 'home' view, not booking_list -->
+            <li><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+            
+            <!-- Booking creation URL remains the same, under bookings app -->
             <li><a class="nav-link" href="{% url 'booking_create' %}">New Booking</a></li>
+            
             {% if user.is_authenticated %}
                 <li>Welcome, {{ user.username }}!</li>
                 <li>
