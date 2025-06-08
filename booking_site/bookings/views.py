@@ -8,9 +8,10 @@ from django.contrib.auth.decorators import login_required
 from .models import Booking
 from .forms import BookingForm
 
-# List all bookings
+# List bookings only for the logged-in user
+@login_required
 def booking_list(request):
-    bookings = Booking.objects.all()
+    bookings = Booking.objects.filter(user=request.user)
     return render(request, 'bookings/booking_list.html', {'bookings': bookings})
 
 # Create new booking - LOGIN REQUIRED
@@ -18,24 +19,26 @@ def booking_list(request):
 def booking_create(request):
     form = BookingForm(request.POST or None)
     if form.is_valid():
-        form.save()
+        booking = form.save(commit=False)
+        booking.user = request.user  # assign logged-in user
+        booking.save()
         return redirect('booking_list')
     return render(request, 'bookings/booking_form.html', {'form': form})
 
-# Update existing booking - LOGIN REQUIRED
+# Update existing booking - LOGIN REQUIRED and ownership check
 @login_required
 def booking_update(request, pk):
-    booking = get_object_or_404(Booking, pk=pk)
+    booking = get_object_or_404(Booking, pk=pk, user=request.user)
     form = BookingForm(request.POST or None, instance=booking)
     if form.is_valid():
         form.save()
         return redirect('booking_list')
     return render(request, 'bookings/booking_form.html', {'form': form})
 
-# Delete a booking - LOGIN REQUIRED
+# Delete a booking - LOGIN REQUIRED and ownership check
 @login_required
 def booking_delete(request, pk):
-    booking = get_object_or_404(Booking, pk=pk)
+    booking = get_object_or_404(Booking, pk=pk, user=request.user)
     if request.method == 'POST':
         booking.delete()
         return redirect('booking_list')
@@ -47,7 +50,7 @@ class CustomLoginView(LoginView):
 
 # Custom logout view using Django's LogoutView
 class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy('login')  # Redirects to login page after logout
+    next_page = reverse_lazy('login')  # Redirect to login page after logout
 
 # User registration view
 def register(request):

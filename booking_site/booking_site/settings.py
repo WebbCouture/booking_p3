@@ -115,7 +115,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = '/static/'  # <-- Changed here, added leading slash
+STATIC_URL = '/static/'  # <-- Leading slash added
 
 
 # Default primary key field type
@@ -123,4 +123,9 @@ STATIC_URL = '/static/'  # <-- Changed here, added leading slash
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGOUT_REDIRECT_URL = 'login'  # Redirect to login after logout
+
+# Redirect after login (fixes /accounts/profile/ 404 error)
+LOGIN_REDIRECT_URL = '/'  # or another URL like '/new/'
+
+# Redirect after logout
+LOGOUT_REDIRECT_URL = 'login'  # This points to your named URL pattern for login
