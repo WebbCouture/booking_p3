@@ -8,11 +8,24 @@ from django.contrib.auth.decorators import login_required
 from .models import Booking
 from .forms import BookingForm
 
+# Home page view
+def home(request):
+    context = {
+        'info_text': (
+            "Welcome to the Booking Site! Use the navigation bar to create, "
+            "view, update, or delete your bookings."
+        )
+    }
+    if request.user.is_authenticated:
+        # Show bookings only for the logged-in user
+        context['bookings'] = Booking.objects.filter(user=request.user)
+    return render(request, 'bookings/home.html', context)
+
 # List bookings only for the logged-in user
 @login_required
 def booking_list(request):
-    bookings = Booking.objects.filter(user=request.user)
-    return render(request, 'bookings/booking_list.html', {'bookings': bookings})
+    # Redirect to home because it now shows bookings when logged in
+    return redirect('home')
 
 # Create new booking - LOGIN REQUIRED
 @login_required
@@ -22,7 +35,7 @@ def booking_create(request):
         booking = form.save(commit=False)
         booking.user = request.user  # assign logged-in user
         booking.save()
-        return redirect('booking_list')
+        return redirect('home')  # redirect to home with bookings shown
     return render(request, 'bookings/booking_form.html', {'form': form})
 
 # Update existing booking - LOGIN REQUIRED and ownership check
@@ -32,7 +45,7 @@ def booking_update(request, pk):
     form = BookingForm(request.POST or None, instance=booking)
     if form.is_valid():
         form.save()
-        return redirect('booking_list')
+        return redirect('home')  # redirect to home
     return render(request, 'bookings/booking_form.html', {'form': form})
 
 # Delete a booking - LOGIN REQUIRED and ownership check
@@ -41,12 +54,14 @@ def booking_delete(request, pk):
     booking = get_object_or_404(Booking, pk=pk, user=request.user)
     if request.method == 'POST':
         booking.delete()
-        return redirect('booking_list')
+        return redirect('home')  # redirect to home
     return render(request, 'bookings/booking_confirm_delete.html', {'booking': booking})
 
 # Custom login view using Django's LoginView
 class CustomLoginView(LoginView):
     template_name = 'bookings/login.html'
+    def get_success_url(self):
+        return reverse_lazy('home')  # redirect to home after login
 
 # Custom logout view using Django's LogoutView
 class CustomLogoutView(LogoutView):
@@ -59,7 +74,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('booking_list')
+            return redirect('home')  # redirect to home after registration
     else:
         form = UserCreationForm()
     return render(request, 'bookings/register.html', {'form': form})

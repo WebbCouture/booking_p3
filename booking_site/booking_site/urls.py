@@ -1,10 +1,13 @@
 from django.contrib import admin
 from django.urls import path, include
-from bookings import views  # import views for login/logout/register
+from bookings import views  # import views for login/logout/register and home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('bookings.urls')),  # include app URLs
+    
+    path('', views.home, name='home'),  # <-- Add home page at root
+    
+    path('bookings/', include('bookings.urls')),  # <-- Move bookings URLs here
     
     path('accounts/login/', views.CustomLoginView.as_view(), name='login'),  # login
     path('accounts/logout/', views.CustomLogoutView.as_view(), name='logout'),  # logout

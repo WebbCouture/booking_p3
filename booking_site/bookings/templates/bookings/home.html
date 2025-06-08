@@ -1,0 +1,35 @@
+{% extends 'bookings/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Welcome to the Booking Site</h1>
+
+<p>
+    This site allows you to manage your bookings easily. Use the navigation bar above to:
+    <ul>
+        <li>Create new bookings</li>
+        <li>View and edit your existing bookings</li>
+        <li>Manage your account by logging in or registering</li>
+    </ul>
+</p>
+
+{% if user.is_authenticated %}
+    <h2>Your Bookings</h2>
+    {% if bookings %}
+        <ul>
+            {% for booking in bookings %}
+                <li>
+                    {{ booking }} — 
+                    <a href="{% url 'booking_update' booking.pk %}">Edit</a> | 
+                    <a href="{% url 'booking_delete' booking.pk %}">Delete</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have no bookings yet. <a href="{% url 'booking_create' %}">Create one now!</a></p>
+    {% endif %}
+{% else %}
+    <p><a href="{% url 'login' %}">Log in</a> to see your bookings and start managing them.</p>
+{% endif %}
+{% endblock %}
