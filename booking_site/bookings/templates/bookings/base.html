@@ -8,10 +8,18 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
 </head>
 <body>
+
     <nav>
         <ul class="nav-list">
             <li><a class="nav-link" href="{% url 'booking_list' %}">Home</a></li>
             <li><a class="nav-link" href="{% url 'booking_create' %}">New Booking</a></li>
+            {% if user.is_authenticated %}
+                <li>Welcome, {{ user.username }}!</li>
+                <li><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                <li><a class="nav-link" href="{% url 'register' %}">Register</a></li>
+            {% endif %}
         </ul>
     </nav>
 

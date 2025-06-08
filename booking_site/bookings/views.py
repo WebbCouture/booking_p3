@@ -1,7 +1,10 @@
-from django.shortcuts import render
-
-# Create your views here.
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+
 from .models import Booking
 from .forms import BookingForm
 
@@ -10,7 +13,8 @@ def booking_list(request):
     bookings = Booking.objects.all()
     return render(request, 'bookings/booking_list.html', {'bookings': bookings})
 
-# Create new booking
+# Create new booking - LOGIN REQUIRED
+@login_required
 def booking_create(request):
     form = BookingForm(request.POST or None)
     if form.is_valid():
@@ -18,7 +22,8 @@ def booking_create(request):
         return redirect('booking_list')
     return render(request, 'bookings/booking_form.html', {'form': form})
 
-# Update existing booking
+# Update existing booking - LOGIN REQUIRED
+@login_required
 def booking_update(request, pk):
     booking = get_object_or_404(Booking, pk=pk)
     form = BookingForm(request.POST or None, instance=booking)
@@ -27,10 +32,31 @@ def booking_update(request, pk):
         return redirect('booking_list')
     return render(request, 'bookings/booking_form.html', {'form': form})
 
-# Delete a booking
+# Delete a booking - LOGIN REQUIRED
+@login_required
 def booking_delete(request, pk):
     booking = get_object_or_404(Booking, pk=pk)
     if request.method == 'POST':
         booking.delete()
         return redirect('booking_list')
     return render(request, 'bookings/booking_confirm_delete.html', {'booking': booking})
+
+# Custom login view using Django's LoginView
+class CustomLoginView(LoginView):
+    template_name = 'bookings/login.html'
+
+# Custom logout view using Django's LogoutView
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('login')
+
+# User registration view
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('booking_list')
+    else:
+        form = UserCreationForm()
+    return render(request, 'bookings/register.html', {'form': form})
