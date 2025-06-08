@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404 
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import UserCreationForm
@@ -47,7 +47,7 @@ class CustomLoginView(LoginView):
 
 # Custom logout view using Django's LogoutView
 class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy('login')
+    next_page = reverse_lazy('login')  # Redirects to login page after logout
 
 # User registration view
 def register(request):
