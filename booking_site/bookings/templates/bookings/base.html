@@ -1,20 +1,28 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}Booking Site{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
 </head>
 <body>
     <nav>
-        <a href="{% url 'booking_list' %}">Home</a> |
-        <a href="{% url 'booking_create' %}">New Booking</a>
+        <ul class="nav-list">
+            <li><a class="nav-link" href="{% url 'booking_list' %}">Home</a></li>
+            <li><a class="nav-link" href="{% url 'booking_create' %}">New Booking</a></li>
+        </ul>
     </nav>
 
-    <div>
+    <main class="container">
         {% block content %}
         <!-- Child templates will put their content here -->
         {% endblock %}
-    </div>
+    </main>
+
+    <footer>
+        <p>© {{ now.year }} Booking Site. All rights reserved.</p>
+    </footer>
 </body>
 </html>
