@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Booking Site{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <nav>
+        <a href="{% url 'booking_list' %}">Home</a> |
+        <a href="{% url 'booking_create' %}">New Booking</a>
+    </nav>
+
+    <div>
+        {% block content %}
+        <!-- Child templates will put their content here -->
+        {% endblock %}
+    </div>
+</body>
+</html>
