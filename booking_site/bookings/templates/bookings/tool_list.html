@@ -12,6 +12,19 @@
             <img src="{{ tool.image.url }}" alt="{{ tool.name }}" class="tool-image" />
             <p><strong>Description:</strong> {{ tool.description }}</p>
             <p><strong>Location:</strong> {{ tool.location }}</p>
+
+            <div class="tool-actions">
+                {% if user.is_authenticated %}
+                    <form method="get" action="{% url 'booking_create' %}">
+                        <input type="hidden" name="tool_id" value="{{ tool.id }}">
+                        <button type="submit" class="book-button">Book Now</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}?next={% url 'booking_create' %}" class="book-button">
+                        Login to Book
+                    </a>
+                {% endif %}
+            </div>
         </div>
     {% empty %}
         <p>No tools available at the moment.</p>

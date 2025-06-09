@@ -5,10 +5,13 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 
-from .models import Booking, Tool  # 👈 Added Tool
+from .models import Booking, Tool
 from .forms import BookingForm
 
+
+# -------------------------
 # Home page view
+# -------------------------
 def home(request):
     context = {
         'info_text': (
@@ -17,27 +20,44 @@ def home(request):
         )
     }
     if request.user.is_authenticated:
-        # Show bookings only for the logged-in user
         context['bookings'] = Booking.objects.filter(user=request.user)
     return render(request, 'bookings/home.html', context)
 
-# List bookings only for the logged-in user
+
+# -------------------------
+# List bookings — just redirect to home
+# -------------------------
 @login_required
 def booking_list(request):
     return redirect('home')
 
-# Create new booking - LOGIN REQUIRED
+
+# -------------------------
+# Create booking with optional tool_id
+# -------------------------
 @login_required
 def booking_create(request):
-    form = BookingForm(request.POST or None)
-    if form.is_valid():
-        booking = form.save(commit=False)
-        booking.user = request.user
-        booking.save()
-        return redirect('home')
+    tool_id = request.GET.get('tool_id')
+
+    if request.method == 'POST':
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save(commit=False)
+            booking.user = request.user
+            booking.save()
+            return redirect('home')
+    else:
+        if tool_id:
+            form = BookingForm(initial={'tool': tool_id})
+        else:
+            form = BookingForm()
+
     return render(request, 'bookings/booking_form.html', {'form': form})
 
-# Update existing booking - LOGIN REQUIRED and ownership check
+
+# -------------------------
+# Update existing booking
+# -------------------------
 @login_required
 def booking_update(request, pk):
     booking = get_object_or_404(Booking, pk=pk, user=request.user)
@@ -47,7 +67,10 @@ def booking_update(request, pk):
         return redirect('home')
     return render(request, 'bookings/booking_form.html', {'form': form})
 
-# Delete a booking - LOGIN REQUIRED and ownership check
+
+# -------------------------
+# Delete booking
+# -------------------------
 @login_required
 def booking_delete(request, pk):
     booking = get_object_or_404(Booking, pk=pk, user=request.user)
@@ -56,17 +79,20 @@ def booking_delete(request, pk):
         return redirect('home')
     return render(request, 'bookings/booking_confirm_delete.html', {'booking': booking})
 
-# Custom login view using Django's LoginView
+
+# -------------------------
+# Login / Logout / Register
+# -------------------------
 class CustomLoginView(LoginView):
     template_name = 'bookings/login.html'
     def get_success_url(self):
         return reverse_lazy('home')
 
-# Custom logout view using Django's LogoutView
+
 class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('login')
 
-# User registration view
+
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -78,7 +104,10 @@ def register(request):
         form = UserCreationForm()
     return render(request, 'bookings/register.html', {'form': form})
 
-# ✅ NEW: List all tools view
+
+# -------------------------
+# Tool list page
+# -------------------------
 def tool_list(request):
     tools = Tool.objects.all()
     return render(request, 'bookings/tool_list.html', {'tools': tools})
