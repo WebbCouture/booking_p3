@@ -1,55 +1,49 @@
 {% extends 'bookings/base.html' %}
 
-{% block title %}Booking Form{% endblock %}
+{% block title %}Book a Tool{% endblock %}
 
 {% block content %}
-<h1>Booking Form</h1>
+<div class="container">
+    <h1>Book a Tool</h1>
 
-<form method="post" novalidate>
-    {% csrf_token %}
-    
-    <p>
-        {{ form.user_name.label_tag }}<br>
-        {{ form.user_name }}<br>
-        {% for error in form.user_name.errors %}
-            <span style="color:red;">{{ error }}</span><br>
-        {% endfor %}
-    </p>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        <p>
+            {{ form.tool.label_tag }}
+            {{ form.tool }}
+            {% for error in form.tool.errors %}
+                <span style="color:red;">{{ error }}</span>
+            {% endfor %}
+        </p>
 
-    <p>
-        {{ form.date.label_tag }}<br>
-        {{ form.date }}<br>
-        {% for error in form.date.errors %}
-            <span style="color:red;">{{ error }}</span><br>
-        {% endfor %}
-    </p>
+        <p>
+            {{ form.date.label_tag }}
+            {{ form.date }}
+            {% for error in form.date.errors %}
+                <span style="color:red;">{{ error }}</span>
+            {% endfor %}
+        </p>
 
-    <p>
-        {{ form.start_time.label_tag }}<br>
-        {{ form.start_time }}<br>
-        {% for error in form.start_time.errors %}
-            <span style="color:red;">{{ error }}</span><br>
-        {% endfor %}
-    </p>
+        <p>
+            {{ form.start_time.label_tag }}
+            {{ form.start_time }}
+            {% for error in form.start_time.errors %}
+                <span style="color:red;">{{ error }}</span>
+            {% endfor %}
+        </p>
 
-    <p>
-        {{ form.end_time.label_tag }}<br>
-        {{ form.end_time }}<br>
-        {% for error in form.end_time.errors %}
-            <span style="color:red;">{{ error }}</span><br>
-        {% endfor %}
-    </p>
-    
-    <p>
-        {{ form.room.label_tag }}<br>
-        {{ form.room }}<br>
-        {% for error in form.room.errors %}
-            <span style="color:red;">{{ error }}</span><br>
-        {% endfor %}
-    </p>
+        <p>
+            {{ form.end_time.label_tag }}
+            {{ form.end_time }}
+            {% for error in form.end_time.errors %}
+                <span style="color:red;">{{ error }}</span>
+            {% endfor %}
+        </p>
 
-    <button type="submit">Save</button>
-</form>
+        <button type="submit">Confirm Booking</button>
+    </form>
 
-<a href="{% url 'booking_list' %}">Back to list</a>
+    <p><a href="{% url 'home' %}">Back to Home</a></p>
+</div>
 {% endblock %}

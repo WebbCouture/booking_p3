@@ -11,3 +11,10 @@ class BookingForm(forms.ModelForm):
             'start_time': forms.TimeInput(attrs={'type': 'time'}),
             'end_time': forms.TimeInput(attrs={'type': 'time'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Disable the tool field if a tool is preselected (e.g., from tool_id in URL)
+        if self.initial.get('tool'):
+            self.fields['tool'].disabled = True
