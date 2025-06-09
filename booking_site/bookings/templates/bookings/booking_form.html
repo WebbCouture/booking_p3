@@ -41,15 +41,16 @@
             {% endfor %}
         </p>
 
-        <!-- ✅ Inline checkbox with Django form rendering -->
-        <p>
-            <label style="display: flex; align-items: center; gap: 6px;">
-                {{ form.send_email }} Send me a confirmation email
+        <!-- ✅ Single-line checkbox with no wrapping -->
+        <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
+            <label for="{{ form.send_email.id_for_label }}" style="margin: 0;">
+                Send me a confirmation email
             </label>
-            {% for error in form.send_email.errors %}
-                <span style="color:red;">{{ error }}</span>
-            {% endfor %}
+            {{ form.send_email }}
         </p>
+        {% for error in form.send_email.errors %}
+            <span style="color:red;">{{ error }}</span>
+        {% endfor %}
 
         <button type="submit">Confirm Booking</button>
     </form>
