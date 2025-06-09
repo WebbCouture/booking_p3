@@ -8,7 +8,7 @@
 
     <form method="post" novalidate>
         {% csrf_token %}
-        
+
         <p>
             {{ form.tool.label_tag }}
             {{ form.tool }}
@@ -39,6 +39,14 @@
             {% for error in form.end_time.errors %}
                 <span style="color:red;">{{ error }}</span>
             {% endfor %}
+        </p>
+
+        <!-- ✅ Checkbox for email confirmation -->
+        <p>
+            <label>
+                <input type="checkbox" name="send_email" {% if request.POST.send_email %}checked{% endif %}>
+                Send me a confirmation email
+            </label>
         </p>
 
         <button type="submit">Confirm Booking</button>

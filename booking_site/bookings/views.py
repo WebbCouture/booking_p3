@@ -4,6 +4,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail  # ✅ Added
 
 from .models import Booking, Tool
 from .forms import BookingForm
@@ -45,7 +46,7 @@ def booking_create(request):
             tool = Tool.objects.get(id=tool_id)
             initial_data['tool'] = tool
         except Tool.DoesNotExist:
-            tool = None  # You can handle this more gracefully if needed
+            tool = None  # Optional: handle invalid tool_id
 
     form = BookingForm(request.POST or None, initial=initial_data)
 
@@ -53,6 +54,22 @@ def booking_create(request):
         booking = form.save(commit=False)
         booking.user = request.user
         booking.save()
+
+        # ✅ Send confirmation email
+        if request.user.email:
+            send_mail(
+                subject='Your Booking Confirmation',
+                message=(
+                    f"Hi {request.user.username},\n\n"
+                    f"Your booking for '{booking.tool.name}' on {booking.date} "
+                    f"from {booking.start_time} to {booking.end_time} has been confirmed.\n\n"
+                    f"Thank you for using our tool booking service!"
+                ),
+                from_email='no-reply@toolbooking.com',  # Change in production
+                recipient_list=[request.user.email],
+                fail_silently=True,  # Prevent crash if email fails
+            )
+
         return redirect('home')
 
     return render(request, 'bookings/booking_form.html', {'form': form})
