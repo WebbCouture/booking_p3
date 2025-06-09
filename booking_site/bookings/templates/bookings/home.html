@@ -3,33 +3,30 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h1>Welcome to the Booking Site</h1>
-
-<p>
-    This site allows you to manage your bookings easily. Use the navigation bar above to:
-    <ul>
-        <li>Create new bookings</li>
-        <li>View and edit your existing bookings</li>
-        <li>Manage your account by logging in or registering</li>
-    </ul>
-</p>
+<h1>Welcome</h1>
+<p>{{ info_text }}</p>
 
 {% if user.is_authenticated %}
-    <h2>Your Bookings</h2>
+    <h2>My Bookings</h2>
     {% if bookings %}
-        <ul>
+        <div class="booking-grid">
             {% for booking in bookings %}
-                <li>
-                    {{ booking }} — 
-                    <a href="{% url 'booking_update' booking.pk %}">Edit</a> | 
-                    <a href="{% url 'booking_delete' booking.pk %}">Delete</a>
-                </li>
+                <div class="booking-card">
+                    <p><strong>Tool:</strong> {{ booking.tool.name }}</p>
+                    <p><strong>Date:</strong> {{ booking.date }}</p>
+                    <p><strong>Start:</strong> {{ booking.start_time }}</p>
+                    <p><strong>End:</strong> {{ booking.end_time }}</p>
+                    <div class="booking-actions">
+                        <a href="{% url 'booking_update' booking.id %}">Edit</a> |
+                        <a href="{% url 'booking_delete' booking.id %}">Delete</a>
+                    </div>
+                </div>
             {% endfor %}
-        </ul>
+        </div>
     {% else %}
-        <p>You have no bookings yet. <a href="{% url 'booking_create' %}">Create one now!</a></p>
+        <p>You have no bookings yet.</p>
     {% endif %}
 {% else %}
-    <p><a href="{% url 'login' %}">Log in</a> to see your bookings and start managing them.</p>
+    <p><a href="{% url 'login' %}">Log in</a> to view or make bookings.</p>
 {% endif %}
 {% endblock %}

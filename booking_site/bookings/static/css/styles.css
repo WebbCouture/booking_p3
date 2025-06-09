@@ -170,3 +170,22 @@ footer {
         width: 90%;
     }
 }
+
+.booking-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.booking-card {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+.booking-actions a {
+    margin-right: 10px;
+    color: #0066cc;
+    text-decoration: none;
+}
