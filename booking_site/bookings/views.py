@@ -38,19 +38,22 @@ def booking_list(request):
 @login_required
 def booking_create(request):
     tool_id = request.GET.get('tool_id')
+    initial_data = {}
 
-    if request.method == 'POST':
-        form = BookingForm(request.POST)
-        if form.is_valid():
-            booking = form.save(commit=False)
-            booking.user = request.user
-            booking.save()
-            return redirect('home')
-    else:
-        if tool_id:
-            form = BookingForm(initial={'tool': tool_id})
-        else:
-            form = BookingForm()
+    if tool_id:
+        try:
+            tool = Tool.objects.get(id=tool_id)
+            initial_data['tool'] = tool
+        except Tool.DoesNotExist:
+            tool = None  # You can handle this more gracefully if needed
+
+    form = BookingForm(request.POST or None, initial=initial_data)
+
+    if form.is_valid():
+        booking = form.save(commit=False)
+        booking.user = request.user
+        booking.save()
+        return redirect('home')
 
     return render(request, 'bookings/booking_form.html', {'form': form})
 
