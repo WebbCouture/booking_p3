@@ -1,4 +1,6 @@
-/* General */
+/* ========================
+   General
+======================== */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
@@ -7,20 +9,23 @@ body {
     line-height: 1.6;
 }
 
-/* Navigation */
+/* ========================
+   Navigation Bar
+======================== */
 nav {
     background-color: #005f73;
     padding: 15px 20px;
-    text-align: center; /* Added to center inline content */
+    text-align: center;
 }
 
 .nav-list {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: inline-flex; /* Changed from flex to inline-flex */
+    display: inline-flex;
     gap: 20px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .nav-link {
@@ -37,31 +42,36 @@ nav {
     outline: none;
 }
 
-/* Container */
+/* ========================
+   Page Container
+======================== */
 .container {
-    max-width: 500px; /* Reduced width for better form focus */
-    margin: 40px auto; /* Center container with more vertical spacing */
+    max-width: 500px;
+    margin: 40px auto;
     background: white;
     padding: 30px 25px;
     border-radius: 8px;
     box-shadow: 0 8px 15px rgba(0,0,0,0.1);
 }
 
-/* Booking form elements */
+/* ========================
+   Form Elements
+======================== */
 form p {
     margin-bottom: 15px;
 }
 
-form input, form select, form textarea {
-    width: 100%;  /* Make inputs full width */
+form input,
+form select,
+form textarea {
+    width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1rem;
-    box-sizing: border-box; /* Make padding count inside width */
+    box-sizing: border-box;
 }
 
-/* Button styling */
 form button {
     background-color: #005f73;
     color: white;
@@ -77,7 +87,45 @@ form button:hover {
     background-color: #0a9396;
 }
 
-/* Footer */
+/* ========================
+   Tool Grid View
+======================== */
+.tool-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start;
+    margin-top: 20px;
+}
+
+.tool-card {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    width: 250px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.tool-card:hover {
+    transform: translateY(-4px);
+}
+
+.tool-card h3 {
+    margin-top: 0;
+}
+
+.tool-image {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* ========================
+   Footer
+======================== */
 footer {
     background-color: #001219;
     color: #94d2bd;
@@ -87,7 +135,9 @@ footer {
     margin-top: 40px;
 }
 
-/* Responsive */
+/* ========================
+   Responsive Design
+======================== */
 @media (max-width: 600px) {
     .nav-list {
         flex-direction: column;
@@ -100,4 +150,49 @@ footer {
         padding: 20px 15px;
         max-width: 95%;
     }
+
+    .tool-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .tool-card {
+        width: 90%;
+    }
+}
+/* ==== Tool List Page ==== */
+.tool-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.tool-card {
+    width: 250px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.tool-card:hover {
+    transform: translateY(-4px);
+}
+
+.tool-card h3 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    color: #005f73;
+}
+
+.tool-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 10px;
 }
