@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect, get_object_or_404 
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail  # ✅ Added
+from django.core.mail import send_mail
 
 from .models import Booking, Tool
 from .forms import BookingForm
@@ -48,29 +48,31 @@ def booking_create(request):
         except Tool.DoesNotExist:
             tool = None  # Optional: handle invalid tool_id
 
-    form = BookingForm(request.POST or None, initial=initial_data)
+    if request.method == 'POST':
+        form = BookingForm(request.POST, initial=initial_data)
+        if form.is_valid():
+            booking = form.save(commit=False)
+            booking.user = request.user
+            booking.save()
 
-    if form.is_valid():
-        booking = form.save(commit=False)
-        booking.user = request.user
-        booking.save()
+            # ✅ Send confirmation email if checkbox is checked
+            if form.cleaned_data.get('send_email') and request.user.email:
+                send_mail(
+                    subject='Your Booking Confirmation',
+                    message=(
+                        f"Hi {request.user.username},\n\n"
+                        f"Your booking for '{booking.tool.name}' on {booking.date} "
+                        f"from {booking.start_time} to {booking.end_time} has been confirmed.\n\n"
+                        f"Thank you for using our tool booking service!"
+                    ),
+                    from_email='no-reply@toolbooking.com',  # Replace in production
+                    recipient_list=[request.user.email],
+                    fail_silently=True,
+                )
 
-        # ✅ Send confirmation email
-        if request.user.email:
-            send_mail(
-                subject='Your Booking Confirmation',
-                message=(
-                    f"Hi {request.user.username},\n\n"
-                    f"Your booking for '{booking.tool.name}' on {booking.date} "
-                    f"from {booking.start_time} to {booking.end_time} has been confirmed.\n\n"
-                    f"Thank you for using our tool booking service!"
-                ),
-                from_email='no-reply@toolbooking.com',  # Change in production
-                recipient_list=[request.user.email],
-                fail_silently=True,  # Prevent crash if email fails
-            )
-
-        return redirect('home')
+            return redirect('home')
+    else:
+        form = BookingForm(initial=initial_data)
 
     return render(request, 'bookings/booking_form.html', {'form': form})
 
@@ -105,6 +107,7 @@ def booking_delete(request, pk):
 # -------------------------
 class CustomLoginView(LoginView):
     template_name = 'bookings/login.html'
+
     def get_success_url(self):
         return reverse_lazy('home')
 

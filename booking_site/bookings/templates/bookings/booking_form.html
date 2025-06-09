@@ -41,12 +41,14 @@
             {% endfor %}
         </p>
 
-        <!-- ✅ Checkbox for email confirmation -->
+        <!-- ✅ Inline checkbox with Django form rendering -->
         <p>
-            <label>
-                <input type="checkbox" name="send_email" {% if request.POST.send_email %}checked{% endif %}>
-                Send me a confirmation email
+            <label style="display: flex; align-items: center; gap: 6px;">
+                {{ form.send_email }} Send me a confirmation email
             </label>
+            {% for error in form.send_email.errors %}
+                <span style="color:red;">{{ error }}</span>
+            {% endfor %}
         </p>
 
         <button type="submit">Confirm Booking</button>

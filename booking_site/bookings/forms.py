@@ -2,10 +2,14 @@ from django import forms
 from .models import Booking
 
 class BookingForm(forms.ModelForm):
+    send_email = forms.BooleanField(
+        required=False,
+        label="Send me a confirmation email"
+    )
+
     class Meta:
         model = Booking
-        # Exclude 'user' because it's assigned in the view, not by the form
-        fields = ['tool', 'date', 'start_time', 'end_time']
+        fields = ['tool', 'date', 'start_time', 'end_time']  # 'send_email' is not part of the model
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
             'start_time': forms.TimeInput(attrs={'type': 'time'}),
