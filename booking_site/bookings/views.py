@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 
-from .models import Booking
+from .models import Booking, Tool  # 👈 Added Tool
 from .forms import BookingForm
 
 # Home page view
@@ -24,7 +24,6 @@ def home(request):
 # List bookings only for the logged-in user
 @login_required
 def booking_list(request):
-    # Redirect to home because it now shows bookings when logged in
     return redirect('home')
 
 # Create new booking - LOGIN REQUIRED
@@ -33,9 +32,9 @@ def booking_create(request):
     form = BookingForm(request.POST or None)
     if form.is_valid():
         booking = form.save(commit=False)
-        booking.user = request.user  # assign logged-in user
+        booking.user = request.user
         booking.save()
-        return redirect('home')  # redirect to home with bookings shown
+        return redirect('home')
     return render(request, 'bookings/booking_form.html', {'form': form})
 
 # Update existing booking - LOGIN REQUIRED and ownership check
@@ -45,7 +44,7 @@ def booking_update(request, pk):
     form = BookingForm(request.POST or None, instance=booking)
     if form.is_valid():
         form.save()
-        return redirect('home')  # redirect to home
+        return redirect('home')
     return render(request, 'bookings/booking_form.html', {'form': form})
 
 # Delete a booking - LOGIN REQUIRED and ownership check
@@ -54,18 +53,18 @@ def booking_delete(request, pk):
     booking = get_object_or_404(Booking, pk=pk, user=request.user)
     if request.method == 'POST':
         booking.delete()
-        return redirect('home')  # redirect to home
+        return redirect('home')
     return render(request, 'bookings/booking_confirm_delete.html', {'booking': booking})
 
 # Custom login view using Django's LoginView
 class CustomLoginView(LoginView):
     template_name = 'bookings/login.html'
     def get_success_url(self):
-        return reverse_lazy('home')  # redirect to home after login
+        return reverse_lazy('home')
 
 # Custom logout view using Django's LogoutView
 class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy('login')  # Redirect to login page after logout
+    next_page = reverse_lazy('login')
 
 # User registration view
 def register(request):
@@ -74,7 +73,12 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('home')  # redirect to home after registration
+            return redirect('home')
     else:
         form = UserCreationForm()
     return render(request, 'bookings/register.html', {'form': form})
+
+# ✅ NEW: List all tools view
+def tool_list(request):
+    tools = Tool.objects.all()
+    return render(request, 'bookings/tool_list.html', {'tools': tools})

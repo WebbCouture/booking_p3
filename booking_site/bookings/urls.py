@@ -2,8 +2,12 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.booking_list, name='booking_list'),  # root of bookings app
-    path('new/', views.booking_create, name='booking_create'),
-    path('<int:pk>/edit/', views.booking_update, name='booking_update'),
-    path('<int:pk>/delete/', views.booking_delete, name='booking_delete'),
+    # Bookings
+    path('', views.booking_list, name='booking_list'),            # Redirects to home (shows bookings)
+    path('new/', views.booking_create, name='booking_create'),    # Create new booking
+    path('<int:pk>/edit/', views.booking_update, name='booking_update'),  # Edit booking
+    path('<int:pk>/delete/', views.booking_delete, name='booking_delete'),# Delete booking
+
+    # Tools
+    path('tools/', views.tool_list, name='tool_list'),            # Show list of tools
 ]
