@@ -9,31 +9,42 @@
 </head>
 <body>
 
-    <nav>
-        <ul class="nav-list">
-            <li><a class="nav-link" href="{% url 'home' %}">Home</a></li>
-            <li><a class="nav-link" href="{% url 'booking_create' %}">New Booking</a></li>
-            <li><a class="nav-link" href="{% url 'tool_list' %}">Tools</a></li>
+    <header>
+        <nav>
+            <ul class="nav-list">
+                <li><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                <li><a class="nav-link" href="{% url 'booking_create' %}">New Booking</a></li>
+                <li><a class="nav-link" href="{% url 'tool_list' %}">Tools</a></li>
 
-            {% if user.is_authenticated %}
-                <li>Welcome, {{ user.username }}!</li>
-                <li>
-                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="nav-link"
-                                style="background:none; border:none; padding:0; cursor:pointer; font:inherit; color:inherit;">
-                            Logout
-                        </button>
-                    </form>
-                </li>
-            {% else %}
-                <li><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                <li><a class="nav-link" href="{% url 'register' %}">Register</a></li>
-            {% endif %}
-        </ul>
-    </nav>
+                {% if user.is_authenticated %}
+                    <li>Welcome, {{ user.username }}!</li>
+                    <li>
+                        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link"
+                                    style="background:none; border:none; padding:0; cursor:pointer; font:inherit; color:inherit;">
+                                Logout
+                            </button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    <li><a class="nav-link" href="{% url 'register' %}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
 
     <main class="container">
+        <!-- ✅ Django Messages -->
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="message {{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
         {% block content %}
         {% endblock %}
     </main>

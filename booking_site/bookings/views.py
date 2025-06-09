@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+from django.contrib import messages  # ✅ For success notifications
 
 from .models import Booking, Tool
 from .forms import BookingForm
@@ -46,7 +47,7 @@ def booking_create(request):
             tool = Tool.objects.get(id=tool_id)
             initial_data['tool'] = tool
         except Tool.DoesNotExist:
-            tool = None  # Optional: handle invalid tool_id
+            tool = None  # Invalid tool_id fallback
 
     if request.method == 'POST':
         form = BookingForm(request.POST, initial=initial_data)
@@ -55,7 +56,6 @@ def booking_create(request):
             booking.user = request.user
             booking.save()
 
-            # ✅ Send confirmation email if checkbox is checked
             if form.cleaned_data.get('send_email') and request.user.email:
                 send_mail(
                     subject='Your Booking Confirmation',
@@ -65,11 +65,12 @@ def booking_create(request):
                         f"from {booking.start_time} to {booking.end_time} has been confirmed.\n\n"
                         f"Thank you for using our tool booking service!"
                     ),
-                    from_email='no-reply@toolbooking.com',  # Replace in production
+                    from_email='no-reply@toolbooking.com',  # Change in production
                     recipient_list=[request.user.email],
                     fail_silently=True,
                 )
 
+            messages.success(request, "Your booking was successful!")
             return redirect('home')
     else:
         form = BookingForm(initial=initial_data)
@@ -86,6 +87,7 @@ def booking_update(request, pk):
     form = BookingForm(request.POST or None, instance=booking)
     if form.is_valid():
         form.save()
+        messages.success(request, "Your booking was updated successfully!")
         return redirect('home')
     return render(request, 'bookings/booking_form.html', {'form': form})
 
@@ -98,6 +100,7 @@ def booking_delete(request, pk):
     booking = get_object_or_404(Booking, pk=pk, user=request.user)
     if request.method == 'POST':
         booking.delete()
+        messages.success(request, "Your booking was deleted.")
         return redirect('home')
     return render(request, 'bookings/booking_confirm_delete.html', {'booking': booking})
 
@@ -122,6 +125,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+            messages.success(request, "Your account was created and you're now logged in!")
             return redirect('home')
     else:
         form = UserCreationForm()
