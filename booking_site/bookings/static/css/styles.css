@@ -77,6 +77,18 @@ form p {
     margin-bottom: 15px;
 }
 
+/* Make checkboxes keep natural size and align label nicely */
+form p input[type="checkbox"] {
+    width: auto;           /* natural checkbox width */
+    margin-right: 8px;     /* spacing between checkbox and label */
+    vertical-align: middle;
+}
+
+form p label {
+    vertical-align: middle;
+    cursor: pointer;       /* pointer cursor on label for better UX */
+}
+
 form input,
 form select,
 form textarea {
