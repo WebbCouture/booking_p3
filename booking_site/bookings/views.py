@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
-from django.contrib import messages  # ✅ For success notifications
+from django.contrib import messages  # For success/error notifications
 
 from .models import Booking, Tool
 from .forms import BookingForm
@@ -72,6 +72,8 @@ def booking_create(request):
 
             messages.success(request, "Your booking was successful!")
             return redirect('home')
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = BookingForm(initial=initial_data)
 
@@ -127,6 +129,12 @@ def register(request):
             login(request, user)
             messages.success(request, "Your account was created and you're now logged in!")
             return redirect('home')
+        else:
+            # Display form errors using Django's messages framework
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+            messages.error(request, "Please fix the errors below.")
     else:
         form = UserCreationForm()
     return render(request, 'bookings/register.html', {'form': form})
