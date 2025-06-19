@@ -6,6 +6,11 @@ class BookingForm(forms.ModelForm):
         required=False,
         label="Send me a confirmation email"
     )
+    confirmation_email = forms.EmailField(
+        required=False,
+        label="Your email address for confirmation",
+        widget=forms.EmailInput(attrs={'placeholder': 'Enter your email if you want a confirmation'})
+    )
 
     class Meta:
         model = Booking
@@ -20,3 +25,11 @@ class BookingForm(forms.ModelForm):
         # Disable the tool field if pre-selected
         if self.initial.get('tool'):
             self.fields['tool'].disabled = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        send_email = cleaned_data.get('send_email')
+        confirmation_email = cleaned_data.get('confirmation_email')
+
+        if send_email and not confirmation_email:
+            self.add_error('confirmation_email', 'Please enter your email address to receive confirmation.')

@@ -27,20 +27,25 @@
             {% endfor %}
         </p>
 
-        <!-- Hidden Start and End Time Fields -->
-        {{ form.start_time.as_hidden }}
-        {{ form.end_time.as_hidden }}
-
         <!-- Email Confirmation Checkbox -->
         <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
+            {{ form.send_email }}
             <label for="{{ form.send_email.id_for_label }}" style="margin: 0;">
                 Send me a confirmation email
             </label>
-            {{ form.send_email }}
         </p>
         {% for error in form.send_email.errors %}
             <span style="color:red;">{{ error }}</span>
         {% endfor %}
+
+        <!-- Confirmation Email Input -->
+        <p>
+            {{ form.confirmation_email.label_tag }}
+            {{ form.confirmation_email }}
+            {% for error in form.confirmation_email.errors %}
+                <span style="color:red;">{{ error }}</span>
+            {% endfor %}
+        </p>
 
         <!-- Booking Info Note -->
         <p style="margin-top: 10px; font-weight: bold;">

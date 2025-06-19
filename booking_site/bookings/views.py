@@ -12,9 +12,6 @@ from .forms import BookingForm
 import datetime
 
 
-# -------------------------
-# Home page view
-# -------------------------
 def home(request):
     context = {
         'info_text': (
@@ -27,17 +24,11 @@ def home(request):
     return render(request, 'bookings/home.html', context)
 
 
-# -------------------------
-# List bookings — just redirect to home
-# -------------------------
 @login_required
 def booking_list(request):
     return redirect('home')
 
 
-# -------------------------
-# Create booking with optional tool_id
-# -------------------------
 @login_required
 def booking_create(request):
     tool_id = request.GET.get('tool_id')
@@ -58,33 +49,39 @@ def booking_create(request):
         if form.is_valid():
             date = form.cleaned_data['date']
             tool = form.cleaned_data['tool']
+            send_email = form.cleaned_data.get('send_email', False)
+            confirmation_email = form.cleaned_data.get('confirmation_email', '').strip()
 
-            # Check for existing booking for the same tool and date
-            if Booking.objects.filter(tool=tool, date=date).exists():
-                messages.error(request, "This tool is already booked for that day. Please choose another date.")
+            # Confirm email presence if send_email is checked (also validated in form.clean)
+            if send_email and not confirmation_email:
+                messages.error(request, "Please enter your email address to receive confirmation.")
             else:
-                booking = form.save(commit=False)
-                booking.user = request.user
-                booking.start_time = datetime.time(10, 0)
-                booking.end_time = datetime.time(17, 0)
-                booking.save()
+                # Check for existing booking for the same tool and date
+                if Booking.objects.filter(tool=tool, date=date).exists():
+                    messages.error(request, "This tool is already booked for that day. Please choose another date.")
+                else:
+                    booking = form.save(commit=False)
+                    booking.user = request.user
+                    booking.start_time = datetime.time(10, 0)
+                    booking.end_time = datetime.time(17, 0)
+                    booking.save()
 
-                if form.cleaned_data.get('send_email') and request.user.email:
-                    send_mail(
-                        subject='Your Booking Confirmation',
-                        message=(
-                            f"Hi {request.user.username},\n\n"
-                            f"Your booking for '{booking.tool.name}' on {booking.date} "
-                            f"from 10:00 to 17:00 has been confirmed.\n\n"
-                            f"Thank you for using our tool booking service!"
-                        ),
-                        from_email='no-reply@toolbooking.com',
-                        recipient_list=[request.user.email],
-                        fail_silently=True,
-                    )
+                    if send_email:
+                        send_mail(
+                            subject='Your Booking Confirmation',
+                            message=(
+                                f"Hi {request.user.username},\n\n"
+                                f"Your booking for '{booking.tool.name}' on {booking.date} "
+                                f"from 10:00 to 17:00 has been confirmed.\n\n"
+                                f"Thank you for using our tool booking service!"
+                            ),
+                            from_email='no-reply@toolbooking.com',
+                            recipient_list=[confirmation_email],
+                            fail_silently=True,
+                        )
 
-                messages.success(request, "Your booking was successful! Pick-up at 10:00, return by 17:00.")
-                return redirect('home')
+                    messages.success(request, "Your booking was successful! Pick-up at 10:00, return by 17:00.")
+                    return redirect('home')
         else:
             messages.error(request, "Please correct the errors below.")
     else:
@@ -93,9 +90,6 @@ def booking_create(request):
     return render(request, 'bookings/booking_form.html', {'form': form})
 
 
-# -------------------------
-# Update existing booking
-# -------------------------
 @login_required
 def booking_update(request, pk):
     booking = get_object_or_404(Booking, pk=pk, user=request.user)
@@ -107,9 +101,6 @@ def booking_update(request, pk):
     return render(request, 'bookings/booking_form.html', {'form': form})
 
 
-# -------------------------
-# Delete booking
-# -------------------------
 @login_required
 def booking_delete(request, pk):
     booking = get_object_or_404(Booking, pk=pk, user=request.user)
@@ -120,9 +111,6 @@ def booking_delete(request, pk):
     return render(request, 'bookings/booking_confirm_delete.html', {'booking': booking})
 
 
-# -------------------------
-# Login / Logout / Register
-# -------------------------
 class CustomLoginView(LoginView):
     template_name = 'bookings/login.html'
 
@@ -152,17 +140,11 @@ def register(request):
     return render(request, 'bookings/register.html', {'form': form})
 
 
-# -------------------------
-# Tool list page
-# -------------------------
 def tool_list(request):
     tools = Tool.objects.all()
     return render(request, 'bookings/tool_list.html', {'tools': tools})
 
 
-# -------------------------
-# API: Get booked dates for a tool
-# -------------------------
 def booked_dates_api(request, tool_id):
     bookings = Booking.objects.filter(tool_id=tool_id)
     booked_dates = list(bookings.values_list('date', flat=True))
