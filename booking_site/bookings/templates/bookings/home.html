@@ -16,10 +16,13 @@
                     <p><strong>Date:</strong> {{ booking.date }}</p>
                     <p><strong>Start:</strong> {{ booking.start_time }}</p>
                     <p><strong>End:</strong> {{ booking.end_time }}</p>
+
+                    {% if booking.date >= today %}
                     <div class="booking-actions">
                         <a href="{% url 'booking_update' booking.id %}">Edit</a> |
                         <a href="{% url 'booking_delete' booking.id %}">Delete</a>
                     </div>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>

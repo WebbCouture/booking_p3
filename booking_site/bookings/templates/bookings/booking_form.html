@@ -60,8 +60,14 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const toolSelect = document.getElementById("id_tool");
     const dateInput = document.getElementById("id_date");
+    const toolSelect = document.getElementById("id_tool");
+
+    // 🔒 Prevent past dates (set min attribute)
+    const today = new Date().toISOString().split("T")[0];
+    if (dateInput) {
+        dateInput.setAttribute("min", today);
+    }
 
     function updateCalendar(toolId) {
         if (!toolId || !dateInput) return;
@@ -70,9 +76,6 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 const bookedDates = data.booked_dates || [];
-
-                // Remove previous listener to avoid duplicates
-                dateInput.oninput = null;
 
                 dateInput.addEventListener("input", function () {
                     const selected = this.value;
@@ -83,21 +86,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 });
 
-                // Trigger once on load to set initial color
-                const event = new Event("input");
-                dateInput.dispatchEvent(event);
+                // Initial trigger
+                dateInput.dispatchEvent(new Event("input"));
             });
     }
-
-    // Auto-fill hidden time fields on date change
-    dateInput.addEventListener("change", function () {
-        const startTimeField = document.getElementById("id_start_time");
-        const endTimeField = document.getElementById("id_end_time");
-        if (startTimeField && endTimeField) {
-            startTimeField.value = "10:00";
-            endTimeField.value = "17:00";
-        }
-    });
 
     if (toolSelect) {
         updateCalendar(toolSelect.value);
@@ -105,6 +97,14 @@ document.addEventListener("DOMContentLoaded", function () {
             updateCalendar(this.value);
         });
     }
+
+    // Auto-fill time if fields exist
+    dateInput?.addEventListener("change", function () {
+        const startTimeField = document.getElementById("id_start_time");
+        const endTimeField = document.getElementById("id_end_time");
+        if (startTimeField) startTimeField.value = "10:00";
+        if (endTimeField) endTimeField.value = "17:00";
+    });
 });
 </script>
 {% endblock %}
