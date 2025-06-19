@@ -42,6 +42,22 @@ nav {
     outline: none;
 }
 
+/* ✅ Lighter user greeting and logout text */
+.nav-user {
+    color: #d0f0f5;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Optional logout button reset */
+.logout-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
+}
+
 /* ========================
    Page Container
 ======================== */
@@ -107,7 +123,7 @@ form button:hover {
     border: 1px solid #ccc;
     border-radius: 10px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    overflow: hidden; /* Ensures image stays within card */
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -126,11 +142,11 @@ form button:hover {
 
 .tool-image {
     width: 100%;
-    height: 300px;              /* Fixed height ensures consistent image size */
-    object-fit: cover;          /* Crops to fill the space without distortion */
+    height: 300px;
+    object-fit: cover;
     border-radius: 8px;
     display: block;
-    margin: 0 auto 12px auto;   /* Center image and add spacing below */
+    margin: 0 auto 12px auto;
 }
 
 /* ========================
@@ -195,21 +211,25 @@ footer {
     padding: 0;
     margin-bottom: 1em;
 }
+
 .message {
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 10px;
 }
+
 .message.success {
     background-color: #e6ffed;
     color: #257942;
     border: 1px solid #a1e8b2;
 }
+
 .message.error {
     background-color: #ffe6e6;
     color: #a94442;
     border: 1px solid #f5c6cb;
 }
+
 .message.warning {
     background-color: #fff3cd;
     color: #856404;

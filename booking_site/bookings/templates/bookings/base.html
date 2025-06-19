@@ -17,12 +17,11 @@
                 <li><a class="nav-link" href="{% url 'tool_list' %}">Tools</a></li>
 
                 {% if user.is_authenticated %}
-                    <li>Welcome, {{ user.username }}!</li>
+                    <li><span class="nav-user">Welcome, {{ user.username }}!</span></li>
                     <li>
                         <form action="{% url 'logout' %}" method="post" style="display:inline;">
                             {% csrf_token %}
-                            <button type="submit" class="nav-link"
-                                    style="background:none; border:none; padding:0; cursor:pointer; font:inherit; color:inherit;">
+                            <button type="submit" class="nav-user logout-button">
                                 Logout
                             </button>
                         </form>
@@ -36,7 +35,6 @@
     </header>
 
     <main class="container">
-        <!-- ✅ Django Messages -->
         {% if messages %}
             <ul class="messages">
                 {% for message in messages %}
