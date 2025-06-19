@@ -14,7 +14,7 @@ class BookingForm(forms.ModelForm):
 
     class Meta:
         model = Booking
-        fields = ['tool', 'date']  # Removed 'start_time' and 'end_time'
+        fields = ['tool', 'date']  # start_time and end_time are fixed in views, so removed here
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
         }
@@ -22,7 +22,7 @@ class BookingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Disable the tool field if pre-selected
+        # Disable the tool field if it's pre-selected via initial data
         if self.initial.get('tool'):
             self.fields['tool'].disabled = True
 
