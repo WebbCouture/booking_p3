@@ -15,4 +15,7 @@ urlpatterns = [
     path('login/', views.CustomLoginView.as_view(), name='login'),
     path('logout/', views.CustomLogoutView.as_view(), name='logout'),
     path('register/', views.register, name='register'),
+
+    # API for fetching booked dates for a tool
+    path('api/booked-dates/<int:tool_id>/', views.booked_dates_api, name='booked_dates_api'),
 ]

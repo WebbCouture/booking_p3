@@ -5,10 +5,11 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
-from django.contrib import messages  # For success/error notifications
-
+from django.contrib import messages
+from django.http import JsonResponse
 from .models import Booking, Tool
 from .forms import BookingForm
+import datetime
 
 
 # -------------------------
@@ -40,38 +41,50 @@ def booking_list(request):
 @login_required
 def booking_create(request):
     tool_id = request.GET.get('tool_id')
-    initial_data = {}
+    initial_data = {
+        'start_time': datetime.time(10, 0),
+        'end_time': datetime.time(17, 0),
+    }
 
     if tool_id:
         try:
             tool = Tool.objects.get(id=tool_id)
             initial_data['tool'] = tool
         except Tool.DoesNotExist:
-            tool = None  # Invalid tool_id fallback
+            tool = None
 
     if request.method == 'POST':
         form = BookingForm(request.POST, initial=initial_data)
         if form.is_valid():
-            booking = form.save(commit=False)
-            booking.user = request.user
-            booking.save()
+            date = form.cleaned_data['date']
+            tool = form.cleaned_data['tool']
 
-            if form.cleaned_data.get('send_email') and request.user.email:
-                send_mail(
-                    subject='Your Booking Confirmation',
-                    message=(
-                        f"Hi {request.user.username},\n\n"
-                        f"Your booking for '{booking.tool.name}' on {booking.date} "
-                        f"from {booking.start_time} to {booking.end_time} has been confirmed.\n\n"
-                        f"Thank you for using our tool booking service!"
-                    ),
-                    from_email='no-reply@toolbooking.com',  # Change in production
-                    recipient_list=[request.user.email],
-                    fail_silently=True,
-                )
+            # Check for existing booking for the same tool and date
+            if Booking.objects.filter(tool=tool, date=date).exists():
+                messages.error(request, "This tool is already booked for that day. Please choose another date.")
+            else:
+                booking = form.save(commit=False)
+                booking.user = request.user
+                booking.start_time = datetime.time(10, 0)
+                booking.end_time = datetime.time(17, 0)
+                booking.save()
 
-            messages.success(request, "Your booking was successful!")
-            return redirect('home')
+                if form.cleaned_data.get('send_email') and request.user.email:
+                    send_mail(
+                        subject='Your Booking Confirmation',
+                        message=(
+                            f"Hi {request.user.username},\n\n"
+                            f"Your booking for '{booking.tool.name}' on {booking.date} "
+                            f"from 10:00 to 17:00 has been confirmed.\n\n"
+                            f"Thank you for using our tool booking service!"
+                        ),
+                        from_email='no-reply@toolbooking.com',
+                        recipient_list=[request.user.email],
+                        fail_silently=True,
+                    )
+
+                messages.success(request, "Your booking was successful! Pick-up at 10:00, return by 17:00.")
+                return redirect('home')
         else:
             messages.error(request, "Please correct the errors below.")
     else:
@@ -130,7 +143,6 @@ def register(request):
             messages.success(request, "Your account was created and you're now logged in!")
             return redirect('home')
         else:
-            # Display form errors using Django's messages framework
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
@@ -146,3 +158,13 @@ def register(request):
 def tool_list(request):
     tools = Tool.objects.all()
     return render(request, 'bookings/tool_list.html', {'tools': tools})
+
+
+# -------------------------
+# API: Get booked dates for a tool
+# -------------------------
+def booked_dates_api(request, tool_id):
+    bookings = Booking.objects.filter(tool_id=tool_id)
+    booked_dates = list(bookings.values_list('date', flat=True))
+    booked_str = [d.strftime('%Y-%m-%d') for d in booked_dates]
+    return JsonResponse({'booked_dates': booked_str})

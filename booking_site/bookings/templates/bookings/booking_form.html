@@ -9,6 +9,7 @@
     <form method="post" novalidate>
         {% csrf_token %}
 
+        <!-- Tool Selection -->
         <p>
             {{ form.tool.label_tag }}
             {{ form.tool }}
@@ -17,6 +18,7 @@
             {% endfor %}
         </p>
 
+        <!-- Date Picker -->
         <p>
             {{ form.date.label_tag }}
             {{ form.date }}
@@ -25,23 +27,11 @@
             {% endfor %}
         </p>
 
-        <p>
-            {{ form.start_time.label_tag }}
-            {{ form.start_time }}
-            {% for error in form.start_time.errors %}
-                <span style="color:red;">{{ error }}</span>
-            {% endfor %}
-        </p>
+        <!-- Hidden Start and End Time Fields -->
+        {{ form.start_time.as_hidden }}
+        {{ form.end_time.as_hidden }}
 
-        <p>
-            {{ form.end_time.label_tag }}
-            {{ form.end_time }}
-            {% for error in form.end_time.errors %}
-                <span style="color:red;">{{ error }}</span>
-            {% endfor %}
-        </p>
-
-        <!-- ✅ Single-line checkbox with no wrapping -->
+        <!-- Email Confirmation Checkbox -->
         <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
             <label for="{{ form.send_email.id_for_label }}" style="margin: 0;">
                 Send me a confirmation email
@@ -52,9 +42,64 @@
             <span style="color:red;">{{ error }}</span>
         {% endfor %}
 
+        <!-- Booking Info Note -->
+        <p style="margin-top: 10px; font-weight: bold;">
+            ✅ Pick up your tool at <strong>10:00</strong> and return it by <strong>17:00</strong> on the same day.
+        </p>
+
         <button type="submit">Confirm Booking</button>
     </form>
 
     <p><a href="{% url 'home' %}">Back to Home</a></p>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const toolSelect = document.getElementById("id_tool");
+    const dateInput = document.getElementById("id_date");
+
+    function updateCalendar(toolId) {
+        if (!toolId || !dateInput) return;
+
+        fetch(`/api/booked-dates/${toolId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const bookedDates = data.booked_dates || [];
+
+                // Remove previous listener to avoid duplicates
+                dateInput.oninput = null;
+
+                dateInput.addEventListener("input", function () {
+                    const selected = this.value;
+                    if (bookedDates.includes(selected)) {
+                        this.style.backgroundColor = "#ffdddd"; // Red = booked
+                    } else {
+                        this.style.backgroundColor = "#ddffdd"; // Green = available
+                    }
+                });
+
+                // Trigger once on load to set initial color
+                const event = new Event("input");
+                dateInput.dispatchEvent(event);
+            });
+    }
+
+    // Auto-fill hidden time fields on date change
+    dateInput.addEventListener("change", function () {
+        const startTimeField = document.getElementById("id_start_time");
+        const endTimeField = document.getElementById("id_end_time");
+        if (startTimeField && endTimeField) {
+            startTimeField.value = "10:00";
+            endTimeField.value = "17:00";
+        }
+    });
+
+    if (toolSelect) {
+        updateCalendar(toolSelect.value);
+        toolSelect.addEventListener("change", function () {
+            updateCalendar(this.value);
+        });
+    }
+});
+</script>
 {% endblock %}
