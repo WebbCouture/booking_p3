@@ -1,15 +1,17 @@
 from django.contrib import admin
 from django.urls import path, include
-from bookings import views  # Import views for home, login, logout, register
+from bookings import views  # import views for home, login, logout, register
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', views.home, name='home'),  # Home page at root URL
+    # Home page at root URL, shows bookings
+    path('', views.home, name='home'),
 
-    path('bookings/', include('bookings.urls')),  # Bookings app URLs
+    # Bookings app URLs
+    path('bookings/', include('bookings.urls')),
 
-    # Authentication URLs grouped under /accounts/
+    # Authentication URLs under /accounts/
     path('accounts/login/', views.CustomLoginView.as_view(), name='login'),
     path('accounts/logout/', views.CustomLogoutView.as_view(), name='logout'),
     path('accounts/register/', views.register, name='register'),
