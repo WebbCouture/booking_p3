@@ -21,6 +21,7 @@ def home(request):
     }
     if request.user.is_authenticated:
         context['bookings'] = Booking.objects.filter(user=request.user)
+        context['today'] = datetime.date.today()  # <-- Add today for template date comparisons
     return render(request, 'bookings/home.html', context)
 
 
@@ -52,11 +53,9 @@ def booking_create(request):
             send_email = form.cleaned_data.get('send_email', False)
             confirmation_email = form.cleaned_data.get('confirmation_email', '').strip()
 
-            # Confirm email presence if send_email is checked (also validated in form.clean)
             if send_email and not confirmation_email:
                 messages.error(request, "Please enter your email address to receive confirmation.")
             else:
-                # Check for existing booking for the same tool and date
                 if Booking.objects.filter(tool=tool, date=date).exists():
                     messages.error(request, "This tool is already booked for that day. Please choose another date.")
                 else:

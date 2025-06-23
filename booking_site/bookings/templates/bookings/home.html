@@ -17,6 +17,7 @@
                     <p><strong>Start:</strong> {{ booking.start_time }}</p>
                     <p><strong>End:</strong> {{ booking.end_time }}</p>
 
+                    {# Show edit/delete only for future bookings #}
                     {% if booking.date >= today %}
                     <div class="booking-actions">
                         <a href="{% url 'booking_update' booking.id %}">Edit</a> |
