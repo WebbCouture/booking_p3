@@ -6,9 +6,10 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from .models import Booking, Tool
 from .forms import BookingForm
+from django.utils import timezone
 import datetime
 
 
@@ -21,7 +22,7 @@ def home(request):
     }
     if request.user.is_authenticated:
         context['bookings'] = Booking.objects.filter(user=request.user)
-        context['today'] = datetime.date.today()  # <-- Add today for template date comparisons
+        context['today'] = datetime.date.today()  # for template date comparisons
     return render(request, 'bookings/home.html', context)
 
 
@@ -92,6 +93,16 @@ def booking_create(request):
 @login_required
 def booking_update(request, pk):
     booking = get_object_or_404(Booking, pk=pk, user=request.user)
+
+    # Combine booking date and end_time into datetime
+    booking_end_datetime = datetime.datetime.combine(booking.date, booking.end_time)
+    booking_end_datetime = timezone.make_aware(booking_end_datetime, timezone.get_current_timezone())
+
+    now = timezone.localtime(timezone.now())
+
+    if booking_end_datetime < now:
+        return HttpResponseForbidden("You cannot edit past bookings.")
+
     form = BookingForm(request.POST or None, instance=booking)
     if form.is_valid():
         form.save()
