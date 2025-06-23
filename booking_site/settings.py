@@ -1,15 +1,18 @@
 from pathlib import Path
-from decouple import config  # Added for .env support
+from decouple import config  # For .env support
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent  # usually parent.parent for project root
 
-# Security
-SECRET_KEY = config('SECRET_KEY')  # Use .env
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = config('SECRET_KEY')
+
+# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
+
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-# Installed apps
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -20,7 +23,6 @@ INSTALLED_APPS = [
     'bookings',  # Your custom app
 ]
 
-# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -31,15 +33,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# ✅ FIXED: URLs and WSGI
-ROOT_URLCONF = 'urls'
-WSGI_APPLICATION = 'wsgi.application'
+# Fix: Fully qualified module paths for URLs and WSGI
+ROOT_URLCONF = 'booking_site.urls'         # change 'booking_site' to your project folder name if different
+WSGI_APPLICATION = 'booking_site.wsgi.application'
 
 # Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [],  # Add your custom template dirs here if any
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -51,7 +53,7 @@ TEMPLATES = [
     },
 ]
 
-# Database
+# Database (SQLite for development)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -73,9 +75,10 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static and media
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 
+# Media files (uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -83,10 +86,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'login'
 
-# Email backend for development
+# Email backend for development (prints emails to console)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Optional real email config (commented)
+# Optional: real email config (uncomment and configure if needed)
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_PORT = 587
@@ -94,5 +97,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 # EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
-# Default primary key type
+# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
