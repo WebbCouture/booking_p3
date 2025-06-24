@@ -1,5 +1,5 @@
 """
-WSGI config for booking_site project.
+WSGI config for booking_p3 project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -10,7 +10,6 @@ https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/
 import os
 from django.core.wsgi import get_wsgi_application
 
-# Ensure this matches your project’s settings module path
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'booking_site.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'booking_p3.settings')
 
 application = get_wsgi_application()
