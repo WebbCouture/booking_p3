@@ -1,1 +1,1 @@
-web: gunicorn booking_p3.wsgi
+web: gunicorn wsgi:application

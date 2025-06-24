@@ -3,11 +3,10 @@
 import os
 import sys
 
-
 def main():
     """Run administrative tasks."""
-    # Since settings.py is at the top level, use 'settings' here
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
+    # Correct path to settings inside the booking_p3 project folder
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'booking_p3.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
@@ -17,7 +16,6 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
     execute_from_command_line(sys.argv)
-
 
 if __name__ == '__main__':
     main()

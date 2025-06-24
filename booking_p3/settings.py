@@ -1,18 +1,17 @@
 from pathlib import Path
-from decouple import config  # For .env support
-import os
-import dj_database_url
+from decouple import config  # pip install python-decouple
+import dj_database_url  # pip install dj-database-url
 import django_heroku
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent  # Project root
+# Paths
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com']
 
-# Application definition
+# Applications
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -23,9 +22,10 @@ INSTALLED_APPS = [
     'bookings',
 ]
 
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # For serving static files on Heroku
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve static files on Heroku
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -34,14 +34,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'urls'
-WSGI_APPLICATION = 'wsgi.application'
+# URLs & WSGI
+ROOT_URLCONF = 'booking_p3.urls'
+WSGI_APPLICATION = 'booking_p3.wsgi.application'
 
 # Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [],  # Add BASE_DIR / 'templates' if you have global templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -56,7 +57,10 @@ TEMPLATES = [
 
 # Database
 DATABASES = {
-    'default': dj_database_url.config(default=f'sqlite:///{BASE_DIR / "db.sqlite3"}')
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        conn_max_age=600
+    )
 }
 
 # Password validation
@@ -74,28 +78,27 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# Static files (CSS, JavaScript)
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'bookings' / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATICFILES_DIRS = [BASE_DIR / 'bookings' / 'static']  # Your app static folder
-
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # Where collectstatic collects to on Heroku
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # WhiteNoise
+# WhiteNoise for static file handling
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files (user-uploaded)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Authentication redirects
+# Authentication
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'login'
 
-# Email backend for development
+# Email (for dev only)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Activate Django-Heroku.
-django_heroku.settings(locals())
+# Heroku integration
+django_heroku.settings(locals(), staticfiles=False)
