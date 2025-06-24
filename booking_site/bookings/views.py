@@ -22,7 +22,7 @@ def home(request):
     }
     if request.user.is_authenticated:
         context['bookings'] = Booking.objects.filter(user=request.user)
-        context['today'] = datetime.date.today()  # for template date comparisons
+        context['today'] = datetime.date.today()
     return render(request, 'bookings/home.html', context)
 
 
@@ -94,10 +94,8 @@ def booking_create(request):
 def booking_update(request, pk):
     booking = get_object_or_404(Booking, pk=pk, user=request.user)
 
-    # Combine booking date and end_time into datetime
     booking_end_datetime = datetime.datetime.combine(booking.date, booking.end_time)
     booking_end_datetime = timezone.make_aware(booking_end_datetime, timezone.get_current_timezone())
-
     now = timezone.localtime(timezone.now())
 
     if booking_end_datetime < now:
@@ -108,16 +106,27 @@ def booking_update(request, pk):
         form.save()
         messages.success(request, "Your booking was updated successfully!")
         return redirect('home')
+
     return render(request, 'bookings/booking_form.html', {'form': form})
 
 
 @login_required
 def booking_delete(request, pk):
     booking = get_object_or_404(Booking, pk=pk, user=request.user)
+
+    # Prevent deleting past bookings
+    booking_end_datetime = datetime.datetime.combine(booking.date, booking.end_time)
+    booking_end_datetime = timezone.make_aware(booking_end_datetime, timezone.get_current_timezone())
+    now = timezone.localtime(timezone.now())
+
+    if booking_end_datetime < now:
+        return HttpResponseForbidden("You cannot delete past bookings.")
+
     if request.method == 'POST':
         booking.delete()
         messages.success(request, "Your booking was deleted.")
         return redirect('home')
+
     return render(request, 'bookings/booking_confirm_delete.html', {'booking': booking})
 
 
