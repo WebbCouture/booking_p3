@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseForbidden, Http404
 from .models import Booking, Tool
 from .forms import BookingForm
 from django.utils import timezone
@@ -34,17 +34,19 @@ def booking_list(request):
 @login_required
 def booking_create(request):
     tool_id = request.GET.get('tool_id')
-    initial_data = {
-        'start_time': datetime.time(10, 0),
-        'end_time': datetime.time(17, 0),
-    }
 
     if tool_id:
-        try:
-            tool = Tool.objects.get(id=tool_id)
-            initial_data['tool'] = tool
-        except Tool.DoesNotExist:
-            tool = None
+        tool = get_object_or_404(Tool, id=tool_id)
+        initial_data = {
+            'start_time': datetime.time(10, 0),
+            'end_time': datetime.time(17, 0),
+            'tool': tool,
+        }
+    else:
+        initial_data = {
+            'start_time': datetime.time(10, 0),
+            'end_time': datetime.time(17, 0),
+        }
 
     if request.method == 'POST':
         form = BookingForm(request.POST, initial=initial_data)
@@ -114,7 +116,6 @@ def booking_update(request, pk):
 def booking_delete(request, pk):
     booking = get_object_or_404(Booking, pk=pk, user=request.user)
 
-    # Prevent deleting past bookings
     booking_end_datetime = datetime.datetime.combine(booking.date, booking.end_time)
     booking_end_datetime = timezone.make_aware(booking_end_datetime, timezone.get_current_timezone())
     now = timezone.localtime(timezone.now())
