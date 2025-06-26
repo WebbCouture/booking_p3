@@ -1,15 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Tool(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    location = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='tool_images/', blank=True, null=True)
+class Location(models.Model):
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
 
+class Tool(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='tool_images/', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
 class Booking(models.Model):
     tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
@@ -17,7 +22,7 @@ class Booking(models.Model):
     date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
-    confirmation_email = models.EmailField(blank=True, null=True)  # optional field for email confirmation
+    confirmation_email = models.EmailField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.tool.name} on {self.date}"
