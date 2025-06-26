@@ -10,7 +10,7 @@ class Location(models.Model):
 class Tool(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    location = models.CharField(max_length=100, blank=True)  # 🔁 Tillfälligt ändrad från ForeignKey
     image = models.ImageField(upload_to='tool_images/', blank=True, null=True)
 
     def __str__(self):
