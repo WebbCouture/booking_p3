@@ -9,13 +9,12 @@
     {% for tool in tools %}
         <div class="tool-card">
             <h3>{{ tool.name }}</h3>
-            {% if tool.cloudinary_url %}
-                <img src="{{ tool.cloudinary_url }}" alt="{{ tool.name }}" class="tool-image" />
-            {% elif tool.image %}
+            {% if tool.image and tool.image.url %}
                 <img src="{{ tool.image.url }}" alt="{{ tool.name }}" class="tool-image" />
             {% else %}
                 <p>No image available.</p>
             {% endif %}
+            
             <p><strong>Description:</strong> {{ tool.description }}</p>
             <p><strong>Location:</strong> {{ tool.location }}</p>
 
