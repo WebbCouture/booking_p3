@@ -14,7 +14,7 @@
             <ul class="nav-list">
                 <li><a class="nav-link" href="{% url 'home' %}">Home</a></li>
                 <li><a class="nav-link" href="{% url 'booking_create' %}">New Booking</a></li>
-                <li><a class="nav-link" href="{% url 'tool_list' %}">Tools</a></li>
+                <li><a class="nav-link" href="{% url 'tools_list' %}">Tools</a></li>
 
                 {% if user.is_authenticated %}
                     <li><span class="nav-user">Welcome, {{ user.username }}!</span></li>

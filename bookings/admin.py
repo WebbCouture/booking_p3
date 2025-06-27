@@ -1,6 +1,17 @@
-# Django admin configuration for the bookings app
 from django.contrib import admin
-from .models import Tool, Booking  # Updated import
+from django.utils.html import format_html
+from .models import Tool, Booking
 
-admin.site.register(Tool)         # Register Tool instead of Room
-admin.site.register(Booking)
+@admin.register(Tool)
+class ToolAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description', 'image_preview')
+
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="height: 50px;"/>', obj.image.url)
+        return "-"
+    image_preview.short_description = 'Image Preview'
+
+@admin.register(Booking)
+class BookingAdmin(admin.ModelAdmin):
+    list_display = ('tool', 'user', 'start_time', 'end_time')

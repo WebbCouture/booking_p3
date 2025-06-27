@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.home, name='home'),                             # Home page (also shows bookings)
@@ -8,7 +10,7 @@ urlpatterns = [
     path('<int:pk>/delete/', views.booking_delete, name='booking_delete'),# Delete booking
 
     # Tools
-    path('tools/', views.tool_list, name='tool_list'),
+     path('tools/', views.tools_list, name='tools_list'),
 
     # Authentication
     path('login/', views.CustomLoginView.as_view(), name='login'),
@@ -17,4 +19,5 @@ urlpatterns = [
 
     # API
     path('api/booked-dates/<int:tool_id>/', views.booked_dates_api, name='booked_dates_api'),
-]
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

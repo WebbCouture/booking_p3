@@ -1,0 +1,22 @@
+{% extends "bookings/base.html" %}
+
+{% block content %}
+<h1>Available Tools</h1>
+
+<ul style="list-style-type:none; padding:0;">
+  {% for tool in tools %}
+    <li style="margin-bottom: 20px;">
+      <h3>{{ tool.name }}</h3>
+      {% if tool.image %}
+        <img src="{{ tool.image.url }}" alt="{{ tool.name }}" style="max-width:200px; height:auto; border:1px solid #ccc; padding:4px;">
+      {% else %}
+        <p>No image available</p>
+      {% endif %}
+      <p>{{ tool.description }}</p>
+    </li>
+  {% empty %}
+    <li>No tools found.</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

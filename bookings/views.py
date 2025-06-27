@@ -7,9 +7,11 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponseForbidden, Http404
+from django.utils import timezone
+
 from .models import Booking, Tool
 from .forms import BookingForm
-from django.utils import timezone
+
 import datetime
 
 
@@ -17,13 +19,18 @@ def home(request):
     context = {
         'info_text': (
             "Welcome to the Booking Site! Use the navigation bar to create, "
-            "view, update, or delete your bookings. All tools picked up at 10:00 and returned by 17:00 at the workshop."
+            "view, update, or delete your bookings. You can pick up tools at 10:00 AM and must return them by 5:00 PM. Adress Workshopstreet 10 12345 Helsingborg"
         )
     }
     if request.user.is_authenticated:
-        context['bookings'] = Booking.objects.filter(user=request.user).order_by('-date', '-start_time')
+        context['bookings'] = Booking.objects.filter(user=request.user)
         context['today'] = datetime.date.today()
     return render(request, 'bookings/home.html', context)
+
+
+@login_required
+def booking_list(request):
+    return redirect('home')
 
 
 @login_required
@@ -155,9 +162,10 @@ def register(request):
     return render(request, 'bookings/register.html', {'form': form})
 
 
-def tool_list(request):
+def tools_list(request):
     tools = Tool.objects.all()
-    return render(request, 'bookings/tool_list.html', {'tools': tools})
+    return render(request, 'bookings/tools_list.html', {'tools': tools})
+
 
 
 def booked_dates_api(request, tool_id):
