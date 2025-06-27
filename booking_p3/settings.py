@@ -6,6 +6,8 @@ import django_heroku
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+DEBUG=False
+
 # Security
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
