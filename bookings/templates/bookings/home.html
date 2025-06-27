@@ -7,28 +7,41 @@
 <p>{{ info_text }}</p>
 
 {% if user.is_authenticated %}
-    <h2>My Bookings</h2>
-    {% if bookings %}
+    <h2>Upcoming Bookings</h2>
+    {% if upcoming_bookings %}
         <div class="booking-grid">
-            {% for booking in bookings %}
+            {% for booking in upcoming_bookings %}
                 <div class="booking-card">
                     <p><strong>Tool:</strong> {{ booking.tool.name }}</p>
                     <p><strong>Date:</strong> {{ booking.date }}</p>
                     <p><strong>Start:</strong> {{ booking.start_time }}</p>
                     <p><strong>End:</strong> {{ booking.end_time }}</p>
 
-                    {# Show edit/delete only for bookings today or in the future #}
-                    {% if booking.date >= today %}
                     <div class="booking-actions">
                         <a href="{% url 'booking_update' booking.id %}">Edit</a> |
                         <a href="{% url 'booking_delete' booking.id %}">Delete</a>
                     </div>
-                    {% endif %}
                 </div>
             {% endfor %}
         </div>
     {% else %}
-        <p>You have no bookings yet.</p>
+        <p>You have no upcoming bookings.</p>
+    {% endif %}
+
+    <h2>Past Bookings</h2>
+    {% if past_bookings %}
+        <div class="booking-grid">
+            {% for booking in past_bookings %}
+                <div class="booking-card past">
+                    <p><strong>Tool:</strong> {{ booking.tool.name }}</p>
+                    <p><strong>Date:</strong> {{ booking.date }}</p>
+                    <p><strong>Start:</strong> {{ booking.start_time }}</p>
+                    <p><strong>End:</strong> {{ booking.end_time }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>You have no past bookings.</p>
     {% endif %}
 {% else %}
     <p><a href="{% url 'login' %}">Log in</a> to view or make bookings.</p>

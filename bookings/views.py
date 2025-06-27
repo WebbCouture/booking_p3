@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponseForbidden, Http404
+from django.http import JsonResponse, HttpResponseForbidden
 from django.utils import timezone
 
 from .models import Booking, Tool
@@ -23,8 +23,32 @@ def home(request):
         )
     }
     if request.user.is_authenticated:
-        context['bookings'] = Booking.objects.filter(user=request.user)
-        context['today'] = datetime.date.today()
+        today = datetime.date.today()
+        now = timezone.localtime()
+
+        # Get bookings for today that haven't ended yet
+        today_bookings = Booking.objects.filter(
+            user=request.user,
+            date=today,
+            end_time__gte=now.time()
+        ).order_by('start_time')
+
+        # Future bookings
+        upcoming_bookings = Booking.objects.filter(
+            user=request.user,
+            date__gt=today
+        ).order_by('date', 'start_time')
+
+        # Past bookings (not today or already ended today)
+        past_bookings = Booking.objects.filter(user=request.user).exclude(
+            id__in=list(upcoming_bookings.values_list('id', flat=True)) +
+                   list(today_bookings.values_list('id', flat=True))
+        ).order_by('-date', '-start_time')
+
+        context['today'] = today
+        context['upcoming_bookings'] = list(today_bookings) + list(upcoming_bookings)
+        context['past_bookings'] = past_bookings
+
     return render(request, 'bookings/home.html', context)
 
 
@@ -165,7 +189,6 @@ def register(request):
 def tools_list(request):
     tools = Tool.objects.all()
     return render(request, 'bookings/tools_list.html', {'tools': tools})
-
 
 
 def booked_dates_api(request, tool_id):
