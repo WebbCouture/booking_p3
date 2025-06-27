@@ -17,18 +17,13 @@ def home(request):
     context = {
         'info_text': (
             "Welcome to the Booking Site! Use the navigation bar to create, "
-            "view, update, or delete your bookings."
+            "view, update, or delete your bookings. All tools picked up at 10:00 and returned by 17:00 at the workshop."
         )
     }
     if request.user.is_authenticated:
-        context['bookings'] = Booking.objects.filter(user=request.user)
+        context['bookings'] = Booking.objects.filter(user=request.user).order_by('-date', '-start_time')
         context['today'] = datetime.date.today()
     return render(request, 'bookings/home.html', context)
-
-
-@login_required
-def booking_list(request):
-    return redirect('home')
 
 
 @login_required
