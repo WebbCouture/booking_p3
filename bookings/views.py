@@ -19,7 +19,7 @@ def home(request):
     context = {
         'info_text': (
             "Welcome to the Booking Site! Use the navigation bar to create, "
-            "view, update, or delete your bookings. You can pick up tools at 10:00 AM and must return them by 5:00 PM. Adress Workshopstreet 10 12345 Helsingborg"
+            "view, update, or delete your bookings. You can pick up tools at 10:00 AM and must return them by 5:00 PM."
         )
     }
     if request.user.is_authenticated:
