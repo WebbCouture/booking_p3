@@ -1,7 +1,6 @@
 # Django admin configuration for the bookings app
 from django.contrib import admin
-from .models import Tool, Booking, Location  # Importera Location
+from .models import Tool, Booking  # Updated import
 
-admin.site.register(Location)  # Registrera Location-modellen
-admin.site.register(Tool)       # Registrera Tool-modellen
-admin.site.register(Booking)    # Registrera Booking-modellen
+admin.site.register(Tool)         # Register Tool instead of Room
+admin.site.register(Booking)
