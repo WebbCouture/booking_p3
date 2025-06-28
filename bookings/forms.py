@@ -1,6 +1,7 @@
 from django import forms
 from .models import Booking
 
+
 class BookingForm(forms.ModelForm):
     send_email = forms.BooleanField(
         required=False,
@@ -9,12 +10,18 @@ class BookingForm(forms.ModelForm):
     confirmation_email = forms.EmailField(
         required=False,
         label="Your email address for confirmation",
-        widget=forms.EmailInput(attrs={'placeholder': 'Enter your email if you want a confirmation'})
+        widget=forms.EmailInput(
+            attrs={
+                'placeholder': (
+                    'Enter your email if you want a confirmation'
+                )
+            }
+        )
     )
 
     class Meta:
         model = Booking
-        fields = ['tool', 'date']  # start_time and end_time are fixed in views, so removed here
+        fields = ['tool', 'date']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
         }
@@ -32,4 +39,7 @@ class BookingForm(forms.ModelForm):
         confirmation_email = cleaned_data.get('confirmation_email')
 
         if send_email and not confirmation_email:
-            self.add_error('confirmation_email', 'Please enter your email address to receive confirmation.')
+            self.add_error(
+                'confirmation_email',
+                'Please enter your email address to receive confirmation.'
+            )

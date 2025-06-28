@@ -19,35 +19,42 @@ def home(request):
     context = {
         'info_text': (
             "Welcome to the Booking Site! Use the navigation bar to create, "
-            "view, update, or delete your bookings. You can pick up tools at 10:00 AM and must return them by 5:00 PM."
+            "view, update, or delete your bookings. You can pick up tools at "
+            "10:00 AM and must return them by 5:00 PM."
         )
     }
+
     if request.user.is_authenticated:
         today = datetime.date.today()
         now = timezone.localtime()
 
-        # Get bookings for today that haven't ended yet
         today_bookings = Booking.objects.filter(
             user=request.user,
             date=today,
             end_time__gte=now.time()
         ).order_by('start_time')
 
-        # Future bookings
         upcoming_bookings = Booking.objects.filter(
             user=request.user,
             date__gt=today
         ).order_by('date', 'start_time')
 
-        # Past bookings (not today or already ended today)
-        past_bookings = Booking.objects.filter(user=request.user).exclude(
+        past_bookings = Booking.objects.filter(
+            user=request.user
+        ).exclude(
             id__in=list(upcoming_bookings.values_list('id', flat=True)) +
-                   list(today_bookings.values_list('id', flat=True))
+            list(today_bookings.values_list('id', flat=True))
         ).order_by('-date', '-start_time')
 
-        context['today'] = today
-        context['upcoming_bookings'] = list(today_bookings) + list(upcoming_bookings)
-        context['past_bookings'] = past_bookings
+        context.update(
+            {
+                'today': today,
+                'upcoming_bookings': (
+                    list(today_bookings) + list(upcoming_bookings)
+                ),
+                'past_bookings': past_bookings,
+            }
+        )
 
     return render(request, 'bookings/home.html', context)
 
@@ -80,13 +87,23 @@ def booking_create(request):
             date = form.cleaned_data['date']
             tool = form.cleaned_data['tool']
             send_email = form.cleaned_data.get('send_email', False)
-            confirmation_email = form.cleaned_data.get('confirmation_email', '').strip()
+            confirmation_email = form.cleaned_data.get(
+                'confirmation_email', ''
+            ).strip()
 
             if send_email and not confirmation_email:
-                messages.error(request, "Please enter your email address to receive confirmation.")
+                messages.error(
+                    request,
+                    "Please enter your email address to receive "
+                    "confirmation."
+                )
             else:
                 if Booking.objects.filter(tool=tool, date=date).exists():
-                    messages.error(request, "This tool is already booked for that day. Please choose another date.")
+                    messages.error(
+                        request,
+                        "This tool is already booked for that day. "
+                        "Please choose another date."
+                    )
                 else:
                     booking = form.save(commit=False)
                     booking.user = request.user
@@ -99,31 +116,45 @@ def booking_create(request):
                             subject='Your Booking Confirmation',
                             message=(
                                 f"Hi {request.user.username},\n\n"
-                                f"Your booking for '{booking.tool.name}' on {booking.date} "
-                                f"from 10:00 to 17:00 has been confirmed.\n\n"
-                                f"Thank you for using our tool booking service!"
+                                f"Your booking for '{booking.tool.name}' on "
+                                f"{booking.date} from 10:00 to 17:00 has "
+                                f"been confirmed.\n\nThank you for using our "
+                                f"tool booking service!"
                             ),
                             from_email='no-reply@toolbooking.com',
                             recipient_list=[confirmation_email],
                             fail_silently=True,
                         )
 
-                    messages.success(request, "Your booking was successful! Pick-up at 10:00, return by 17:00.")
+                    messages.success(
+                        request,
+                        "Your booking was successful! Pick-up at 10:00, "
+                        "return by 17:00."
+                    )
                     return redirect('home')
         else:
             messages.error(request, "Please correct the errors below.")
     else:
         form = BookingForm(initial=initial_data)
 
-    return render(request, 'bookings/booking_form.html', {'form': form})
+    return render(
+        request,
+        'bookings/booking_form.html',
+        {'form': form}
+    )
 
 
 @login_required
 def booking_update(request, pk):
     booking = get_object_or_404(Booking, pk=pk, user=request.user)
 
-    booking_end_datetime = datetime.datetime.combine(booking.date, booking.end_time)
-    booking_end_datetime = timezone.make_aware(booking_end_datetime, timezone.get_current_timezone())
+    booking_end_datetime = datetime.datetime.combine(
+        booking.date, booking.end_time
+    )
+    booking_end_datetime = timezone.make_aware(
+        booking_end_datetime,
+        timezone.get_current_timezone()
+    )
     now = timezone.localtime(timezone.now())
 
     if booking_end_datetime < now:
@@ -135,15 +166,24 @@ def booking_update(request, pk):
         messages.success(request, "Your booking was updated successfully!")
         return redirect('home')
 
-    return render(request, 'bookings/booking_form.html', {'form': form})
+    return render(
+        request,
+        'bookings/booking_form.html',
+        {'form': form}
+    )
 
 
 @login_required
 def booking_delete(request, pk):
     booking = get_object_or_404(Booking, pk=pk, user=request.user)
 
-    booking_end_datetime = datetime.datetime.combine(booking.date, booking.end_time)
-    booking_end_datetime = timezone.make_aware(booking_end_datetime, timezone.get_current_timezone())
+    booking_end_datetime = datetime.datetime.combine(
+        booking.date, booking.end_time
+    )
+    booking_end_datetime = timezone.make_aware(
+        booking_end_datetime,
+        timezone.get_current_timezone()
+    )
     now = timezone.localtime(timezone.now())
 
     if booking_end_datetime < now:
@@ -154,7 +194,11 @@ def booking_delete(request, pk):
         messages.success(request, "Your booking was deleted.")
         return redirect('home')
 
-    return render(request, 'bookings/booking_confirm_delete.html', {'booking': booking})
+    return render(
+        request,
+        'bookings/booking_confirm_delete.html',
+        {'booking': booking}
+    )
 
 
 class CustomLoginView(LoginView):
@@ -174,7 +218,10 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, "Your account was created and you're now logged in!")
+            messages.success(
+                request,
+                "Your account was created and you're now logged in!"
+            )
             return redirect('home')
         else:
             for field, errors in form.errors.items():
@@ -183,6 +230,7 @@ def register(request):
             messages.error(request, "Please fix the errors below.")
     else:
         form = UserCreationForm()
+
     return render(request, 'bookings/register.html', {'form': form})
 
 
